@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+  
+  <artifactId>Person</artifactId>
+ <packaging>pom</packaging>
+
+    <parent>
+        <groupId>com.tura</groupId>
+        <artifactId>optics</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <modules>
+    	
+        <module>ejb</module>
+        <module>web</module>
+        <module>ear</module>
+    </modules>
+    
+    <dependencyManagement>
+        <dependencies>
+            
+            <dependency>
+			    <groupId>org.wildfly</groupId>
+			    <artifactId>wildfly-jaxws-client-bom</artifactId>
+			    <version>${version.server.bom}</version>
+			    <scope>import</scope>
+			    <type>pom</type>
+			</dependency>
+			
+			<!-- Define the version of the EJB jar so that we don't need
+                to repeat ourselves in every module -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>Person-ejb</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
+
+            <!-- Define the version of the WAR so that we don't need to repeat
+                ourselves in every module -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ejb-in-ear-web</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+                <scope>compile</scope>
+            </dependency>
+            
+            <!-- Import the shared API module, which is used by Maven at compilation
+            time. See the corresponding Dependencies entry in the MANIFEST.mf which defines
+            the dependency at runtime. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Common</artifactId>
+            <type>ejb</type>
+            <version>${project.version}</version>
+        </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+   
+  <dependencies>
+  
+  
+        
+	<dependency>
+		    <groupId>org.jboss.ws</groupId>
+		    <artifactId>jbossws-api</artifactId>
+		    <scope>provided</scope>
+		</dependency> 
+   
+ 
+ <dependency>
+    <groupId>org.wildfly</groupId>
+    <artifactId>wildfly-weld</artifactId>
+    <version>18.0.1.Final</version>
+</dependency>
+ 
+	<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
+<dependency>
+    <groupId>commons-validator</groupId>
+    <artifactId>commons-validator</artifactId>
+    <version>1.7</version>
+    <exclusions>
+    	<exclusion>
+    		<groupId>commons-logging</groupId>
+    		<artifactId>commons-logging</artifactId>
+    	</exclusion>
+    </exclusions>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.unitils/unitils-core -->
+<dependency>
+    <groupId>org.unitils</groupId>
+    <artifactId>unitils-core</artifactId>
+    <version>3.4.6</version>
+
+    <exclusions>
+    	<exclusion>
+    		<groupId>commons-logging</groupId>
+    		<artifactId>commons-logging</artifactId>
+    	</exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+  <groupId>org.granite</groupId>
+  <artifactId>granite-generator</artifactId>
+  <version>2.3.2.GA</version>
+</dependency>
+<dependency>
+  <groupId>org.granite</groupId>
+  <artifactId>granite-flex</artifactId>
+  <version>2.3.2.GA</version>
+</dependency>
+		
+  </dependencies>
+  <build>
+   
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+		      		      
+		      <plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>build-helper-maven-plugin</artifactId>
+		        
+		        <executions>
+		          <execution>
+		            <id>add-source</id>
+		            <phase>generate-sources</phase>
+		            <goals>
+		              <goal>add-source</goal>
+		            </goals>
+		            <configuration>
+		              <sources>
+		                <source>src/</source>
+		              </sources>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+      
+		      <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <!-- Jakarta EE doesn't require web.xml, Maven needs to
+                        catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <!-- Define a dependency on the shared API, which will
+                        be used by JBoss Modules at runtime. See the corresponding dependency declared
+                        in the POM, which defines the dependency at compile time. -->
+                    <archive>
+                        <manifestEntries>
+                            <Dependencies>deployment.Common.jar</Dependencies>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            
+    </plugins>
+  </build>
+</project>
